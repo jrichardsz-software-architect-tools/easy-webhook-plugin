@@ -5,15 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jrichardsz.jenkins.plugins.easywebhook.exceptions.RequiredParameterWasNotFoundException;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 
 public class ExpressionEvaluator {
 
   private SimpleScriptEvaluator simpleScriptEvaluator = new SimpleScriptEvaluator();
-
 
   public Map<String, String> execute(String webhookPayload,
       ArrayList<String> variablesToBeEvaluated, String scmId) throws Exception {
@@ -21,22 +18,20 @@ public class ExpressionEvaluator {
     if (variablesToBeEvaluated == null) {
       return null;
     }
-
+    
     Configuration conf = Configuration.defaultConfiguration();
     Configuration customConf = conf.addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL);
-
     Object document = customConf.jsonProvider().parse(webhookPayload);
 
+    simpleScriptEvaluator.init(customConf, document);
+    
     HashMap<String, String> parsedParameters = new HashMap<String, String>();
 
     // iterate all variables and one by one
-    // evaluate in order to evaluate
-    // jsonpath or groovy expression
     for (String variableNameToBeEvaluated : variablesToBeEvaluated) {
 
       String jsonPathPrefix = getJsonPathPrefixToSearchInInternalPropertiesFile(scmId);
-      // contains a raw string chich could be a
-      // jsonpath or groovy expression
+      // contains a raw string which should be a groovy expression
       String rawValue =
           getValueFromInternalPropertiesFile(variableNameToBeEvaluated, jsonPathPrefix);
 
@@ -44,51 +39,11 @@ public class ExpressionEvaluator {
         continue;
       }
 
-      if (isJsonPathExpression(rawValue)) {
-        try {
-          String jsonPathValue = JsonPath.read(document, rawValue);
-          parsedParameters.put(variableNameToBeEvaluated, jsonPathValue);
-        } catch (Exception e) {
-          throw new RequiredParameterWasNotFoundException(variableNameToBeEvaluated
-              + " parameter is required. Is not possible get it from webhook json.", e);
-        }
-      } else if (isGroovyExpression(rawValue)) {
-        // get the inner jsonpath expression
-        String jsonPathExpression = getJsonPathFromGroovy(rawValue);
-        if (isJsonPathExpression(jsonPathExpression)) {
-          // evaluate inner jsonpath expression
-          String jsonPathValue = null;
-          try {
-            jsonPathValue = JsonPath.read(document, jsonPathExpression);
-          } catch (Exception e) {
-            throw new RequiredParameterWasNotFoundException(variableNameToBeEvaluated
-                + " parameter is required. Is not possible get it from webhook json.", e);
-          }
-
-          // use the obtained inner value to get groovy value
-          String groovyPrefix = getGroovyPrefixToSearchInInternalPropertiesFile(scmId);
-          // now, we need to get the groovy expression
-          String groovyExpression = null;
-          try {
-            groovyExpression =
-                getValueFromInternalPropertiesFile(variableNameToBeEvaluated, groovyPrefix);
-          } catch (Exception e) {
-            throw new Exception("An error ocurred when groovy expression was searched: "
-                + variableNameToBeEvaluated, e);
-          }
-
-          // grrovy expression and its variables are ready to use
-          HashMap<String, String> variablesToBeUsedInScript = new HashMap<String, String>();
-          variablesToBeUsedInScript.put(variableNameToBeEvaluated, jsonPathValue);
-          // execute groovy and get return value as expected value
-          String finalValue = "" + simpleScriptEvaluator.execute("return " + groovyExpression,
-              variablesToBeUsedInScript, this.getClass().getClassLoader());
-          parsedParameters.put(variableNameToBeEvaluated, finalValue);
-
-        }
-      } else {
-        parsedParameters.put(variableNameToBeEvaluated, rawValue);
-      }
+      HashMap<String, String> variablesToBeUsedInScript = new HashMap<String, String>();
+      // execute groovy and get the return value
+      String finalValue = "" + simpleScriptEvaluator.execute(rawValue, variablesToBeUsedInScript,
+          this.getClass().getClassLoader());
+      parsedParameters.put(variableNameToBeEvaluated, finalValue);
     }
 
     return parsedParameters;
@@ -99,7 +54,7 @@ public class ExpressionEvaluator {
   }
 
   public String getJsonPathPrefixToSearchInInternalPropertiesFile(String scmId) {
-    return String.format("%s.jsonpath.expression.", scmId);
+    return String.format("%s.expression.", scmId);
   }
 
   public String getGroovyPrefixToSearchInInternalPropertiesFile(String scmId) {

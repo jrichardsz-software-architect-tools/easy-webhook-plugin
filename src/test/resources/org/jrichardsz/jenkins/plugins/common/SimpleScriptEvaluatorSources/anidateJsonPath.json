@@ -1,0 +1,11 @@
+{
+  "Type": "Notification",
+  "MessageId": "296892a1a77b",
+  "TopicArn": "arn:aws:sns:us-bar-1:123456:TopicFoo",
+  "Subject": "UPDATE: AWS CodeCommit us-bar-1 push: my-awesome-repo",
+  "Message": "{\"Records\":[{\"awsRegion\":\"us-bar-1\",\"codecommit\":{\"references\":[{\"commit\":\"fb28ebbec522cc403\",\"ref\":\"refs/heads/mybranch\"}]},\"customData\":null,\"eventId\":\"d1dab883\",\"eventName\":\"ReferenceChanges\",\"eventPartNumber\":1,\"eventSource\":\"aws:codecommit\",\"eventSourceARN\":\"arn:aws:codecommit:us-bar-1:123456:my-awesome-repo\",\"eventTime\":\"2021-06-23T20:57:15.005+0000\",\"eventTotalParts\":1,\"eventTriggerConfigId\":\"e4ea5f3bec6c\",\"eventTriggerName\":\"my_ci_server_notification\",\"eventVersion\":\"1.0\",\"userIdentityARN\":\"arn:aws:iam::123456:user/jane_doe\"}]}",
+  "Timestamp": "2021-06-23T20:57:15.040Z",
+  "SignatureVersion": "1",
+  "SigningCertURL": "https://sns.us-bar-1.amazonaws.com/SimpleNotificationService-foo-.pem",
+  "UnsubscribeURL": "https://foo.bar"
+}

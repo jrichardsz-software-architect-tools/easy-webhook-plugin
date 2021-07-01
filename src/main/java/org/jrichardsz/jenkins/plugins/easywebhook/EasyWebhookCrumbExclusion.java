@@ -21,13 +21,13 @@ public class EasyWebhookCrumbExclusion extends CrumbExclusion {
 
   private static final Logger LOGGER = Logger.getLogger(EasyWebhookCrumbExclusion.class.getName());
 
-  private static final ImmutableSet<String> ALWAYS_READABLE_PATHS = ImmutableSet.of(
-          "/ajaxExecutors", "/ajaxBuildQueue", "/administrativeMonitor", "/descriptorByName",
-          "/configSubmit");
+  private static final ImmutableSet<String> ALWAYS_READABLE_PATHS =
+      ImmutableSet.of("/ajaxExecutors", "/ajaxBuildQueue", "/administrativeMonitor",
+          "/descriptorByName", "/configSubmit");
 
   @Override
   public boolean process(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
-          throws IOException, ServletException {
+      throws IOException, ServletException {
 
     String uri = req.getPathInfo();
 
@@ -40,7 +40,7 @@ public class EasyWebhookCrumbExclusion extends CrumbExclusion {
     String exclusionPath = null;
     try {
       exclusionPath = "/" + Constants.UNPROTECTED_ROOT_ACTION_PREFIX + "-"
-              + SystemPluginConfiguration.getCurrentProperties().getEasyWebHookKey();
+          + SystemPluginConfiguration.getCurrentProperties().getEasyWebHookKey();
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }

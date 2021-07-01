@@ -19,7 +19,6 @@ public class ClassPathProperties {
 
   public static Properties getCustomInstance(InputStream propertiesInputStream) throws Exception {
 
-    Properties properties = null;
     InputStream input = null;
 
     try {
@@ -52,7 +51,7 @@ public class ClassPathProperties {
     String value = properties.getProperty(property);
     if (value == null) {
       throw new Exception(
-          "Failed to read key in application.properties instance: key[" + property + "]");
+          String.format("Failed to read key %s in jenkins-plugin.properties instance", property));
     }
     return value;
   }

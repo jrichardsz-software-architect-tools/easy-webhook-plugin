@@ -14,6 +14,7 @@ public class ScmWebHookJsonParser {
     variablesToBeEvaluated.add("repositoryName");
     variablesToBeEvaluated.add("branchName");
     variablesToBeEvaluated.add("authorId");
+    variablesToBeEvaluated.add("commitId");
     variablesToBeEvaluated.add("eventMessage");
 
     // @TODO: Detect event type (push, commit, pr created, branch deletion, etc)

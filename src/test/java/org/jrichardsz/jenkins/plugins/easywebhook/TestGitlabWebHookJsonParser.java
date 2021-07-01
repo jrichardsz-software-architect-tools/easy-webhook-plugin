@@ -23,15 +23,15 @@ public class TestGitlabWebHookJsonParser {
 
   @Before
   public void setUp() throws IOException {
-    jsonInput =
-        IOUtils.toString(this.getClass().getResourceAsStream("gitlab_webhook.json"), "UTF-8");
+    jsonInput = IOUtils.toString(this.getClass().getResourceAsStream(
+        "/org/jrichardsz/jenkins/plugins/easywebhook/gitlab/gitlab_webhook.json"), "UTF-8");
   }
 
   @Test
   public void t001_getSimpĺeValues() throws Exception {
 
-    ClassPathProperties.customInitialization(TestGitlabWebHookJsonParser.class
-        .getResourceAsStream("gitlab-test-simple-jenkins-plugin.properties"));
+    ClassPathProperties.customInitialization(TestGitlabWebHookJsonParser.class.getResourceAsStream(
+        "/org/jrichardsz/jenkins/plugins/easywebhook/gitlab/simple-jenkins-plugin.properties"));
 
     ScmWebHookJsonParser webHookJsonParser = new ScmWebHookJsonParser();
     Map<String, String> valuesFromJsonWebhook =
@@ -47,11 +47,11 @@ public class TestGitlabWebHookJsonParser {
     assertEquals("jrichardsz.java@gmail.com", valuesFromJsonWebhook.get("authorId"));
     assertEquals("Update README.md", valuesFromJsonWebhook.get("eventMessage"));
   }
-  
+
   @Test
   public void t002_getComplexValues() throws Exception {
-    ClassPathProperties.customInitialization(TestGitlabWebHookJsonParser.class
-        .getResourceAsStream("gitlab-test-complex-jenkins-plugin.properties"));
+    ClassPathProperties.customInitialization(TestGitlabWebHookJsonParser.class.getResourceAsStream(
+        "/org/jrichardsz/jenkins/plugins/easywebhook/gitlab/complex-jenkins-plugin.properties"));
 
     ScmWebHookJsonParser webHookJsonParser = new ScmWebHookJsonParser();
     Map<String, String> valuesFromJsonWebhook =
@@ -61,11 +61,13 @@ public class TestGitlabWebHookJsonParser {
     assertNotNull(valuesFromJsonWebhook.get("branchName"));
     assertNotNull(valuesFromJsonWebhook.get("authorId"));
     assertNotNull(valuesFromJsonWebhook.get("eventMessage"));
+    assertNotNull(valuesFromJsonWebhook.get("commitId"));
 
     assertEquals("gitlab_repository", valuesFromJsonWebhook.get("repositoryName"));
     assertEquals("lassie_branch", valuesFromJsonWebhook.get("branchName"));
     assertEquals("jrichardsz.java@gmail.com", valuesFromJsonWebhook.get("authorId"));
     assertEquals("Update README.md", valuesFromJsonWebhook.get("eventMessage"));
+    assertEquals("fa61658291900e59df0", valuesFromJsonWebhook.get("commitId"));
   }
 
 }
